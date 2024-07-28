@@ -21,7 +21,7 @@ public class CustomerService {
         return customerDao.selectAllCustomers();
     }
 
-    public Customer getCustomer(Integer id) {
+    public Customer getCustomer(Long id) {
         return customerDao.selectCustomerById(id)
                 .orElseThrow(() -> new ResourceNotFound(
                         "customer with id [%s] not found".formatted(id)
@@ -38,7 +38,7 @@ public class CustomerService {
                 customerRegistrationRequest.email(),
                 customerRegistrationRequest.age()));
     }
-    public void deleteCustomerById(Integer id) {
+    public void deleteCustomerById(Long id) {
         if(customerDao.existsPersonWithId(id)) {
             throw new ResourceNotFound(
                     "customer with id [%s] not found".formatted(id));
@@ -46,7 +46,7 @@ public class CustomerService {
         customerDao.deleteCustomerById(id);
     }
     public void updateCustomer(
-            Integer id,
+            Long id,
             CustomerUpdateRequest updateRequest) {
         Customer customer = getCustomer(id);
         boolean changes = false;
