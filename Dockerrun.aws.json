@@ -3,7 +3,7 @@
   "containerDefinitions": [
     {
       "name": "aplicatiemeditatii-api",
-      "image": "mirceaa04/aplicatiemeditatii-api:latest",
+      "image": "mirceaa04/aplicatiemeditatii-api:24.08.2024.11.48.50",
       "essential": true,
       "memory": 512,
       "portMappings": [
