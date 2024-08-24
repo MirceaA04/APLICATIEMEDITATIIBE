@@ -8,7 +8,7 @@ spring:
     baseline-on-migrate: true
   datasource:
     url: jdbc:postgresql://localhost:5332/customer
-    username: AplicatieMeditatii
+    username: appMedi
     password: Tr6u9c25&1234567
   jpa:
     hibernate:

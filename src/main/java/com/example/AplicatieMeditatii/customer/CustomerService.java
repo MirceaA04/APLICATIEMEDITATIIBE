@@ -2,7 +2,7 @@ package com.example.AplicatieMeditatii.customer;
 
 import com.example.AplicatieMeditatii.exception.DuplicateResourceException;
 import com.example.AplicatieMeditatii.exception.RequestValidationException;
-import com.example.AplicatieMeditatii.exception.ResourceNotFound;
+import com.example.AplicatieMeditatii.exception.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
@@ -13,7 +13,7 @@ public class CustomerService {
 
     private final CustomerDao customerDao;
 
-    public CustomerService(@Qualifier("jpa") CustomerDao customerDao) {
+    public CustomerService(@Qualifier("jdbc") CustomerDao customerDao) {
         this.customerDao = customerDao;
     }
 
@@ -23,14 +23,14 @@ public class CustomerService {
 
     public Customer getCustomer(Long id) {
         return customerDao.selectCustomerById(id)
-                .orElseThrow(() -> new ResourceNotFound(
+                .orElseThrow(() -> new ResourceNotFoundException(
                         "customer with id [%s] not found".formatted(id)
                 ));
     }
 
     public void addCustomer(CustomerRegistrationRequest customerRegistrationRequest) {
         String email = customerRegistrationRequest.email();
-        if(customerDao.existsPersonWithEmail(email)) {
+        if(customerDao.existsCustomerWithEmail(email)) {
             throw new DuplicateResourceException("email [%s] already exists".formatted(email));
         }
         customerDao.insertCustomer(new Customer(
@@ -39,8 +39,8 @@ public class CustomerService {
                 customerRegistrationRequest.age()));
     }
     public void deleteCustomerById(Long id) {
-        if(customerDao.existsPersonWithId(id)) {
-            throw new ResourceNotFound(
+        if(!customerDao.existsCustomerWithId(id)) {
+            throw new ResourceNotFoundException(
                     "customer with id [%s] not found".formatted(id));
         }
         customerDao.deleteCustomerById(id);
@@ -50,25 +50,25 @@ public class CustomerService {
             CustomerUpdateRequest updateRequest) {
         Customer customer = getCustomer(id);
         boolean changes = false;
-        if(updateRequest.name() != null || !updateRequest.name().equals(customer.getName())) {
+        if(updateRequest.name() != null && !updateRequest.name().equals(customer.getName())) {
             customer.setName(updateRequest.name());
             changes = true;
         }
-        if(updateRequest.email() != null || !updateRequest.email().equals(customer.getEmail())) {
-            if(customerDao.existsPersonWithEmail(updateRequest.email())) {
+        if(updateRequest.email() != null && !updateRequest.email().equals(customer.getEmail())) {
+            if(customerDao.existsCustomerWithEmail(updateRequest.email())) {
                 throw new DuplicateResourceException("email [%s] already exists".formatted(updateRequest.email()));
             }
             customer.setEmail(updateRequest.email());
             changes = true;
         }
-        if(updateRequest.age() != null || updateRequest.age() != customer.getAge()) {
+        if(updateRequest.age() != null && updateRequest.age() != customer.getAge()) {
             customer.setAge(updateRequest.age());
             changes = true;
         }
         if(!changes) {
             throw new RequestValidationException("no data changes found");
         }
-        customerDao.insertCustomer(customer);
+        customerDao.updateCustomer(customer);
     }
 
 }
