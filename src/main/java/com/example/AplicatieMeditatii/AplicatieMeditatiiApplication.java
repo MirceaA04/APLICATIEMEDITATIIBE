@@ -16,6 +16,8 @@ public class AplicatieMeditatiiApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(AplicatieMeditatiiApplication.class, args);
+
+
 	}
 	@Bean
 	CommandLineRunner runner(CustomerRepository customerRepository) {
